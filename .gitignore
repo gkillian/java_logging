@@ -1,3 +1,10 @@
+# Maven target directory
+target
+
+# VIM backup files
+*~
+.*~
+
 # Compiled class file
 *.class
 
