@@ -1,0 +1,50 @@
+https://stackoverflow.com/questions/194765/how-do-i-get-java-logging-output-to-appear-on-a-single-line
+
+
+As of Java 7,java.util.logging.SimpleFormatter supports getting its 
+format from a system property, so adding something like this to the 
+JVM command line will cause it to print on one line:
+
+    -Djava.util.logging.SimpleFormatter.format='%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n'
+
+Alternatively, you can also add this to your logger.properties:
+
+    java.util.logging.SimpleFormatter.format='%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n'
+
+
+My Favorite:
+
+    -Djava.util.logging.SimpleFormatter.format=%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %2$s %5$s%6$s%n
+
+which makes output like:
+
+    2014-09-02 16:44:57 SEVERE org.jboss.windup.util.ZipUtil unzip: Failed to load: foo.zip
+
+
+===================== MAVEN ==================================================
+
+!-- Surefire -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.17</version>
+            <configuration>
+                <systemPropertyVariables>
+                    <!-- Set JUL Formatting -->
+                    <java.util.logging.SimpleFormatter.format>%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %2$s %5$s%6$s%n</java.util.logging.SimpleFormatter.format>
+                </systemPropertyVariables>
+            </configuration>
+        </plugin>
+
+============ SET IN JAVA CODE ==================================================
+
+    // must be set PRIOR to the first SimpleFormatter is created
+    System.setProperty("java.util.logging.SimpleFormatter.format", 
+             "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+
+
+============= TOMCAT =========================================================
+
+if you log in a web application using tomcat add:
+
+    -Djava.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter
